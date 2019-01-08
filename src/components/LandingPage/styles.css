@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.authContainer {
+  padding: 40px;
+  border: 5px dotted pink;
+}
+
+.buttonsContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
