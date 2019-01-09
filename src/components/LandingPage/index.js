@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './styles.css';
 import { withRouter } from 'react-router-dom';
-import firebase from '../Firebase';
+import firebase, { GoogleAuthProvider } from '../Firebase';
 
 import * as ROUTES from '../../constants/routes';
 
@@ -42,6 +42,20 @@ class LandingPage extends Component {
     });
   }
 
+  onGoogleButton(event) {
+    event.preventDefault();
+
+    firebase
+    .auth()
+    .signInWithPopup(GoogleAuthProvider)
+    .then(user => {
+      this.props.history.push(ROUTES.HOME);
+    })
+    .catch(error => {
+      this.setState({ error });
+    })
+  }
+
   render() {
     const {
       email,
@@ -71,6 +85,7 @@ class LandingPage extends Component {
           <div className="buttonsContainer">
             <button onClick={this.onSignUpButton.bind(this)}>Sign Up</button>
             <button onClick={this.onSignInButton.bind(this)}>Sign In</button>
+            <button onClick={this.onGoogleButton.bind(this)}>Sign In With Google</button>
           </div>
 
           {error && <p>{error.message}</p>}
