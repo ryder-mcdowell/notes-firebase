@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import LandingPage from '../LandingPage';
-import Home from '../Home';
-
-import * as ROUTES from '../../constants/routes';
+import firebase from '../Firebase';
+import Navigation from '../Navigation';
 
 class App extends Component {
+  state = { authenticated: false };
+
+  componentDidMount() {
+    firebase.auth().onAuthStateChanged(authenticated => {
+      authenticated
+        ? this.setState({ authenticated: true })
+        : this.setState({ authenticated: false })
+    });
+  }
+
   render() {
     return (
-      <Router>
-        <div>
-          <Route exact path={ROUTES.LANDING} component={LandingPage} />
-          <Route path={ROUTES.HOME} component={Home} />
-        </div>
-      </Router>
+      <Navigation authenticated={this.state.authenticated} />
     );
   }
 }
