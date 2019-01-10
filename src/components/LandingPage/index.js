@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './styles.css';
 import { withRouter } from 'react-router-dom';
 import firebase, { GoogleAuthProvider } from '../Firebase';
+import Input from '@material-ui/core/Input';
+import Button from '@material-ui/core/Button';
 
 import * as ROUTES from '../../constants/routes';
 
@@ -66,7 +68,7 @@ class LandingPage extends Component {
     return (
       <div className="container">
         <div className ="authContainer">
-          <input
+          <Input
             name="email"
             value={email}
             onChange={this.onChange}
@@ -74,19 +76,19 @@ class LandingPage extends Component {
             placeholder="email"
           />
           <br />
-          <input
+          <Input
             name="password"
             value={password}
             onChange={this.onChange}
             type="password"
-            placeholder="Password"
+            placeholder="password"
           />
           <br />
           <div className="buttonsContainer">
-            <button onClick={this.onSignUpButton.bind(this)}>Sign Up</button>
-            <button onClick={this.onSignInButton.bind(this)}>Sign In</button>
-            <button onClick={this.onGoogleButton.bind(this)}>Sign In With Google</button>
+            <Button onClick={this.onSignUpButton.bind(this)} variant="outlined">Sign Up</Button>
+            <Button onClick={this.onSignInButton.bind(this)} variant="outlined">Sign In</Button>
           </div>
+          <Button onClick={this.onGoogleButton.bind(this)} variant="outlined">Sign In With Google</Button>
 
           {error && <p>{error.message}</p>}
         </div>
