@@ -1,10 +1,20 @@
 .container {
   display: flex;
-  justify-content: center;
-  margin-top: 40px;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
 }
 
-.userInfoContainer {
-  padding: 40px;
-  border: 5px dotted pink;
+
+.listContainer {
+  flex: 1;
+  background-color: rgb(200,200,200);
+}
+
+.detailContainer {
+  display: flex;
+  flex: 3;
+  background-color: rgb(150,150,150);
+  justify-content: center;
+  padding-top: 40px;
 }
