@@ -36,6 +36,58 @@ class Dashboard extends Component {
     this.setState({ title: '' });
   }
 
+  onDeleteNoteButton() {
+    const {
+      selected
+    } = this.state;
+
+    firebase.database().ref('notes/' + selected).remove();
+  }
+
+  renderDetail() {
+    const {
+      selected,
+      title,
+      notes
+    } = this.state;
+
+    if (selected === 'new') {
+      return (
+        <div>
+          <Input
+            name="title"
+            value={title}
+            onChange={this.onChange}
+            type="text"
+            placeholder="Enter title"
+            disableUnderline
+            className="input"
+          />
+          <Button
+            onClick={this.onCreateNoteButton.bind(this)}
+            variant="outlined"
+          >
+            Create Note
+          </Button>
+        </div>
+      );
+    } else if (selected) {
+      return (
+        <div className="detailContent">
+          {notes[selected] ? notes[selected].title : ''}
+          <Button
+            onClick={this.onDeleteNoteButton.bind(this)}
+            variant="outlined"
+          >
+            Delete
+          </Button>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+
   render() {
     const {
       selected,
@@ -64,29 +116,7 @@ class Dashboard extends Component {
           }
         </List>
         <div className="detailContainer">
-          {
-            selected === 'new'
-              ? (
-                <div>
-                  <Input
-                    name="title"
-                    value={title}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Enter title"
-                    disableUnderline
-                    className="input"
-                  />
-                  <Button
-                    onClick={this.onCreateNoteButton.bind(this)}
-                    variant="outlined"
-                  >
-                    Create Note
-                  </Button>
-                </div>
-              )
-              : notes[selected] ? notes[selected].title : ''
-          }
+          {this.renderDetail()}
         </div>
       </div>
     );
