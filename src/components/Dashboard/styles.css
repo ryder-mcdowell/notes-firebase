@@ -5,7 +5,6 @@
   height: 100vh;
 }
 
-
 .listContainer {
   flex: 1;
   background-color: rgb(200,200,200);
@@ -17,4 +16,11 @@
   background-color: rgb(150,150,150);
   justify-content: center;
   padding-top: 40px;
+}
+
+.input {
+  height: 20px;
+  background-color: rgb(200,200,200);
+  padding: 8px;
+  border-radius: 8px;
 }
