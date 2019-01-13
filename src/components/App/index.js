@@ -7,7 +7,6 @@ class App extends Component {
 
   componentDidMount() {
     firebase.auth().onAuthStateChanged(authenticated => {
-      console.log(authenticated)
       authenticated
         ? this.setState({ authenticated: true })
         : this.setState({ authenticated: false })

@@ -8,10 +8,18 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Input from '@material-ui/core/Input';
 import Button from '@material-ui/core/Button';
 
-var data = [{ id: 1, title: 'test1'}, { id: 2, title: 'test2'}, { id: 3, title: 'test3'}];
-
 class Dashboard extends Component {
-  state = { selected: null, title: '' };
+  state = {
+    selected: null,
+    title: '',
+    notes: {}
+  };
+
+  componentDidMount() {
+    firebase.database().ref('notes/').on('value', snapshot => {
+      this.setState({ notes: snapshot.val() })
+    });
+  }
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
@@ -25,12 +33,14 @@ class Dashboard extends Component {
     firebase.database().ref('notes/' + uuidv4()).set({
       title
     });
+    this.setState({ title: '' });
   }
 
   render() {
     const {
       selected,
-      title
+      title,
+      notes
     } = this.state;
 
     return (
@@ -43,12 +53,12 @@ class Dashboard extends Component {
             <ListItemText>+ New Note</ListItemText>
           </ListItem>
           {
-            data.map(note =>
+            Object.keys(notes).map(key =>
               <ListItem
-                onClick={() => this.setState({ selected: note.id })}
-                selected={selected === note.id}
+                onClick={() => this.setState({ selected: key })}
+                selected={selected === key}
               >
-                <ListItemText>{note.title}</ListItemText>
+                <ListItemText>{notes[key].title}</ListItemText>
               </ListItem>
             )
           }
@@ -75,7 +85,7 @@ class Dashboard extends Component {
                   </Button>
                 </div>
               )
-              : selected
+              : notes[selected] ? notes[selected].title : ''
           }
         </div>
       </div>
