@@ -12,6 +12,7 @@ class Dashboard extends Component {
   state = {
     selected: null,
     title: '',
+    editing: false,
     notes: {}
   };
 
@@ -36,6 +37,24 @@ class Dashboard extends Component {
     this.setState({ title: '' });
   }
 
+  onUpdateNoteButton() {
+    const {
+      title,
+      editing,
+      selected,
+      notes
+    } = this.state;
+
+    if (editing) {
+      firebase.database().ref('notes/' + selected).update({
+        title
+      })
+      this.setState({ editing: false });
+    } else {
+      this.setState({ editing: true, title: notes[selected].title });
+    }
+  }
+
   onDeleteNoteButton() {
     const {
       selected
@@ -48,6 +67,7 @@ class Dashboard extends Component {
     const {
       selected,
       title,
+      editing,
       notes
     } = this.state;
 
@@ -74,7 +94,27 @@ class Dashboard extends Component {
     } else if (selected) {
       return (
         <div className="detailContent">
-          {notes[selected] ? notes[selected].title : ''}
+          {
+            editing
+              ? (
+                <Input
+                  name="title"
+                  value={title}
+                  onChange={this.onChange}
+                  type="text"
+                  placeholder="Enter title"
+                  disableUnderline
+                  className="input"
+                />
+              )
+              : notes[selected].title
+          }
+          <Button
+            onClick={this.onUpdateNoteButton.bind(this)}
+            variant="outlined"
+          >
+            {this.state.editing ? 'Confirm' : 'Update Note'}
+          </Button>
           <Button
             onClick={this.onDeleteNoteButton.bind(this)}
             variant="outlined"
@@ -91,7 +131,6 @@ class Dashboard extends Component {
   render() {
     const {
       selected,
-      title,
       notes
     } = this.state;
 
