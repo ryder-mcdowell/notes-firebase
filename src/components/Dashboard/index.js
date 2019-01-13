@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './styles.css';
 import firebase from '../Firebase';
 
-class Home extends Component {
+class Dashboard extends Component {
   render() {
     return (
       <div className="container">
@@ -14,4 +14,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default Dashboard;

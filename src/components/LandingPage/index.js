@@ -22,7 +22,7 @@ class LandingPage extends Component {
     .auth()
     .createUserWithEmailAndPassword(email, password)
     .then(user => {
-      this.props.history.push(ROUTES.HOME);
+      this.props.history.push(ROUTES.DASHBOARD);
     })
     .catch(error => {
       this.setState({ error });
@@ -37,7 +37,7 @@ class LandingPage extends Component {
     .auth()
     .signInWithEmailAndPassword(email, password)
     .then(user => {
-      this.props.history.push(ROUTES.HOME);
+      this.props.history.push(ROUTES.DASHBOARD);
     })
     .catch(error => {
       this.setState({ error });
@@ -51,7 +51,7 @@ class LandingPage extends Component {
     .auth()
     .signInWithPopup(GoogleAuthProvider)
     .then(user => {
-      this.props.history.push(ROUTES.HOME);
+      this.props.history.push(ROUTES.DASHBOARD);
     })
     .catch(error => {
       this.setState({ error });
