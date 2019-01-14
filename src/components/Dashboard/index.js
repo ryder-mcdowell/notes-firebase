@@ -12,6 +12,7 @@ class Dashboard extends Component {
   state = {
     selected: null,
     title: '',
+    body: '',
     editing: false,
     notes: {}
   };
@@ -40,6 +41,7 @@ class Dashboard extends Component {
   onUpdateNoteButton() {
     const {
       title,
+      body,
       editing,
       selected,
       notes
@@ -47,11 +49,12 @@ class Dashboard extends Component {
 
     if (editing) {
       firebase.database().ref('notes/' + selected).update({
-        title
+        title,
+        body: body || null
       })
       this.setState({ editing: false });
     } else {
-      this.setState({ editing: true, title: notes[selected].title });
+      this.setState({ editing: true, title: notes[selected].title, body: notes[selected].body });
     }
   }
 
@@ -60,6 +63,7 @@ class Dashboard extends Component {
       selected
     } = this.state;
 
+    this.setState({ selected: null });
     firebase.database().ref('notes/' + selected).remove();
   }
 
@@ -67,6 +71,7 @@ class Dashboard extends Component {
     const {
       selected,
       title,
+      body,
       editing,
       notes
     } = this.state;
@@ -97,17 +102,34 @@ class Dashboard extends Component {
           {
             editing
               ? (
-                <Input
-                  name="title"
-                  value={title}
-                  onChange={this.onChange}
-                  type="text"
-                  placeholder="Enter title"
-                  disableUnderline
-                  className="input"
-                />
+                <div>
+                  <Input
+                    name="title"
+                    value={title}
+                    onChange={this.onChange}
+                    type="text"
+                    placeholder="Enter title"
+                    disableUnderline
+                    className="input"
+                  />
+                  <Input
+                    name="body"
+                    value={body}
+                    onChange={this.onChange}
+                    type="text"
+                    placeholder="Enter body"
+                    disableUnderline
+                    className="input"
+                  />
+                </div>
               )
-              : notes[selected].title
+              : (
+                <div>
+                  {notes[selected].title}
+                  <br />
+                  {notes[selected].body}
+                </div>
+              )
           }
           <Button
             onClick={this.onUpdateNoteButton.bind(this)}
