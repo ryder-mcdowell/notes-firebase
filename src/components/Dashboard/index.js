@@ -157,7 +157,7 @@ class Dashboard extends Component {
     } = this.state;
 
     return (
-      <div className="container">
+      <div className="dashboardContainer">
         <List className="listContainer">
           <ListItem
             onClick={() => this.setState({ selected: 'new' })}

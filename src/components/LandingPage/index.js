@@ -66,7 +66,7 @@ class LandingPage extends Component {
     } = this.state;
 
     return (
-      <div className="container">
+      <div className="landingPageContainer">
         <div className ="authContainer">
           <Input
             name="email"
