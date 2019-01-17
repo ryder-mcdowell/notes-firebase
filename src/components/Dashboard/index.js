@@ -152,7 +152,7 @@ class Dashboard extends Component {
                 </div>
               )
               : (
-                <div>
+                <div className="noteContentContainer">
                   {notes[selected].title}
                   <br />
                   {notes[selected].body}
@@ -175,7 +175,7 @@ class Dashboard extends Component {
             name="file"
             onChange={this.onFileSelect}
             type="file"
-            placeholder="No file selected."
+            className="fileInput"
           />
           <Button
             onClick={this.onUploadFileButton.bind(this)}
@@ -184,7 +184,13 @@ class Dashboard extends Component {
             Upload Image
           </Button>
           {selectedImage
-            ? <img src={selectedImage} alt="no source" height="200" width="200" />
+            ? <img
+              src={selectedImage}
+              alt="no source"
+              height="200"
+              width="200"
+              className="noteImage"
+              />
             : null
           }
         </div>

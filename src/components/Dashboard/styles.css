@@ -24,6 +24,10 @@
   align-items: center;
 }
 
+.noteContentContainer {
+  margin-bottom: 20px;
+}
+
 .input {
   height: 20px;
   background-color: rgb(200,200,200);
@@ -31,7 +35,10 @@
   border-radius: 8px;
 }
 
-.image {
-  height: 200px;
-  width: 200px;
+.fileInput {
+  margin-top: 20px;
+}
+
+.noteImage {
+  margin-top: 20px;
 }
