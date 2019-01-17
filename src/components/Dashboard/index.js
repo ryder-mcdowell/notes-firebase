@@ -13,6 +13,7 @@ class Dashboard extends Component {
     selected: null,
     title: '',
     body: '',
+    file: null,
     editing: false,
     notes: {}
   };
@@ -25,6 +26,10 @@ class Dashboard extends Component {
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
+  }
+
+  onFileSelect = event => {
+    this.setState({ [event.target.name]: event.target.files[0] });
   }
 
   onCreateNoteButton() {
@@ -65,6 +70,19 @@ class Dashboard extends Component {
 
     this.setState({ selected: null });
     firebase.database().ref('notes/' + selected).remove();
+  }
+
+  onUploadFileButton() {
+    const {
+      file,
+      selected
+    } = this.state;
+
+    console.log(file)
+
+    this.setState({ file: null });
+    firebase.storage().ref('images/' + selected).put(file)
+      .then(snapshot => console.log('success'))
   }
 
   renderDetail() {
@@ -143,6 +161,18 @@ class Dashboard extends Component {
           >
             Delete
           </Button>
+          <input
+            name="file"
+            onChange={this.onFileSelect}
+            type="file"
+            placeholder="No file selected."
+          />
+          <Button
+            onClick={this.onUploadFileButton.bind(this)}
+            variant="outlined"
+          >
+            Upload Image
+          </Button>
         </div>
       );
     } else {
@@ -170,6 +200,7 @@ class Dashboard extends Component {
               <ListItem
                 onClick={() => this.setState({ selected: key })}
                 selected={selected === key}
+                key={key}
               >
                 <ListItemText>{notes[key].title}</ListItemText>
               </ListItem>

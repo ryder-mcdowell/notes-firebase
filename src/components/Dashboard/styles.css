@@ -30,3 +30,8 @@
   padding: 8px;
   border-radius: 8px;
 }
+
+.image {
+  height: 200px;
+  width: 200px;
+}
