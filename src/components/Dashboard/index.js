@@ -11,8 +11,10 @@ import Button from '@material-ui/core/Button';
 class Dashboard extends Component {
   state = {
     selected: null,
+    selectedImage: null,
     title: '',
     body: '',
+    file: null,
     editing: false,
     notes: {}
   };
@@ -25,6 +27,10 @@ class Dashboard extends Component {
 
   onChange = event => {
     this.setState({ [event.target.name]: event.target.value });
+  }
+
+  onFileSelect = event => {
+    this.setState({ [event.target.name]: event.target.files[0] });
   }
 
   onCreateNoteButton() {
@@ -67,9 +73,33 @@ class Dashboard extends Component {
     firebase.database().ref('notes/' + selected).remove();
   }
 
+  onUploadFileButton() {
+    const {
+      file,
+      selected
+    } = this.state;
+
+
+    firebase.storage().ref('images/' + selected).put(file)
+      .then(snapshot => {
+        firebase.storage().ref('images/' + selected).getDownloadURL()
+          .then(url => this.setState({ selectedImage: url }))
+          .catch(err => this.setState({ selectedImage: null }));
+      })
+  }
+
+  selectNote(key) {
+    this.setState({ selected: key });
+
+    firebase.storage().ref('images/' + key).getDownloadURL()
+      .then(url => this.setState({ selectedImage: url }))
+      .catch(err => this.setState({ selectedImage: null }));
+  }
+
   renderDetail() {
     const {
       selected,
+      selectedImage,
       title,
       body,
       editing,
@@ -124,7 +154,7 @@ class Dashboard extends Component {
                 </div>
               )
               : (
-                <div>
+                <div className="noteContentContainer">
                   {notes[selected].title}
                   <br />
                   {notes[selected].body}
@@ -143,6 +173,28 @@ class Dashboard extends Component {
           >
             Delete
           </Button>
+          <input
+            name="file"
+            onChange={this.onFileSelect}
+            type="file"
+            className="fileInput"
+          />
+          <Button
+            onClick={this.onUploadFileButton.bind(this)}
+            variant="outlined"
+          >
+            Upload Image
+          </Button>
+          {selectedImage
+            ? <img
+              src={selectedImage}
+              alt="no source"
+              height="200"
+              width="200"
+              className="noteImage"
+              />
+            : null
+          }
         </div>
       );
     } else {
@@ -157,7 +209,7 @@ class Dashboard extends Component {
     } = this.state;
 
     return (
-      <div className="container">
+      <div className="dashboardContainer">
         <List className="listContainer">
           <ListItem
             onClick={() => this.setState({ selected: 'new' })}
@@ -168,8 +220,9 @@ class Dashboard extends Component {
           {
             Object.keys(notes).map(key =>
               <ListItem
-                onClick={() => this.setState({ selected: key })}
+                onClick={() => this.selectNote(key)}
                 selected={selected === key}
+                key={key}
               >
                 <ListItemText>{notes[key].title}</ListItemText>
               </ListItem>

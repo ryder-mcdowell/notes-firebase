@@ -1,8 +1,8 @@
-.container {
+.dashboardContainer {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100vh;
+  height: 90vh;
 }
 
 .listContainer {
@@ -24,9 +24,21 @@
   align-items: center;
 }
 
+.noteContentContainer {
+  margin-bottom: 20px;
+}
+
 .input {
   height: 20px;
   background-color: rgb(200,200,200);
   padding: 8px;
   border-radius: 8px;
+}
+
+.fileInput {
+  margin-top: 20px;
+}
+
+.noteImage {
+  margin-top: 20px;
 }

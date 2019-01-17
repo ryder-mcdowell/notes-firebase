@@ -1,20 +1,29 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
-import ProtectedRoute from '../ProtectedRoute';
-import LandingPage from '../LandingPage';
-import Dashboard from '../Dashboard';
+import './styles.css';
+import { Link } from 'react-router-dom';
+import AppBar from '@material-ui/core/AppBar';
+import MenuItem from '@material-ui/core/MenuItem';
+import Typography from '@material-ui/core/Typography';
 
 import * as ROUTES from '../../constants/routes';
 
 class Navigation extends Component {
   render() {
     return (
-      <Router>
-        <Switch>
-          <Route exact path={ROUTES.LANDING} render={() => this.props.authenticated ? <Redirect to={ROUTES.DASHBOARD} /> : <LandingPage />} />
-          <ProtectedRoute authenticated={this.props.authenticated} path={ROUTES.LANDING} component={Dashboard} />
-        </Switch>
-      </Router>
+      <AppBar
+        position="sticky"
+      >
+        <MenuItem>
+          <Link
+            to={ROUTES.DASHBOARD}
+            className="link"
+          >
+            <Typography variant="button">
+              Dashboard
+            </Typography>
+          </Link>
+        </MenuItem>
+      </AppBar>
     );
   }
 }
