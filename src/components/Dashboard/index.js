@@ -79,11 +79,13 @@ class Dashboard extends Component {
       selected
     } = this.state;
 
-    console.log(file)
 
-    this.setState({ file: null });
     firebase.storage().ref('images/' + selected).put(file)
-      .then(snapshot => console.log('success'))
+      .then(snapshot => {
+        firebase.storage().ref('images/' + selected).getDownloadURL()
+          .then(url => this.setState({ selectedImage: url }))
+          .catch(err => this.setState({ selectedImage: null }));
+      })
   }
 
   selectNote(key) {
