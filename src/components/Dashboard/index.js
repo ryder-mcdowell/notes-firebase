@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 class Dashboard extends Component {
   state = {
     selected: null,
+    selectedImage: null,
     title: '',
     body: '',
     file: null,
@@ -85,9 +86,18 @@ class Dashboard extends Component {
       .then(snapshot => console.log('success'))
   }
 
+  selectNote(key) {
+    this.setState({ selected: key });
+
+    firebase.storage().ref('images/' + key).getDownloadURL()
+      .then(url => this.setState({ selectedImage: url }))
+      .catch(err => this.setState({ selectedImage: null }));
+  }
+
   renderDetail() {
     const {
       selected,
+      selectedImage,
       title,
       body,
       editing,
@@ -173,6 +183,10 @@ class Dashboard extends Component {
           >
             Upload Image
           </Button>
+          {selectedImage
+            ? <img src={selectedImage} alt="no source" height="200" width="200" />
+            : null
+          }
         </div>
       );
     } else {
@@ -198,7 +212,7 @@ class Dashboard extends Component {
           {
             Object.keys(notes).map(key =>
               <ListItem
-                onClick={() => this.setState({ selected: key })}
+                onClick={() => this.selectNote(key)}
                 selected={selected === key}
                 key={key}
               >
