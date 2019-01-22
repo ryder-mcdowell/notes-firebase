@@ -21,7 +21,7 @@ class Dashboard extends Component {
   };
 
   componentDidMount() {
-    firebase.database().ref('categories/').on('value', snapshot => {
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/').on('value', snapshot => {
       this.setState({ noteCategories: snapshot.val() })
     });
   }
@@ -39,7 +39,7 @@ class Dashboard extends Component {
       title
     } = this.state;
 
-    firebase.database().ref('categories/' + uuidv4()).set({
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + uuidv4()).set({
       title
     });
 
@@ -52,7 +52,7 @@ class Dashboard extends Component {
       selectedNoteCategory,
     } = this.state;
 
-    firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + uuidv4()).set({
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + uuidv4()).set({
       title
     });
 
@@ -70,7 +70,7 @@ class Dashboard extends Component {
     } = this.state;
 
     if (editing) {
-      firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + selectedNote).update({
+      firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + selectedNote).update({
         title,
         body: body || null
       })
@@ -87,7 +87,7 @@ class Dashboard extends Component {
     } = this.state;
 
     this.setState({ selectedNote: null });
-    firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + selectedNote).remove();
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + selectedNote).remove();
   }
 
   onUploadFileButton() {
