@@ -144,7 +144,7 @@ class Dashboard extends Component {
             <ListItemText>+ New Category</ListItemText>
           </ListItem>
           {
-            Object.keys(noteCategories).map(key =>
+            Object.keys(noteCategories || {}).map(key =>
               <NoteCategory
                 onClick={() => this.selectCategory(key)}
                 selectNote={key => this.selectNote(key)}
