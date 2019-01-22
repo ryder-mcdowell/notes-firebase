@@ -97,9 +97,9 @@ class Dashboard extends Component {
     } = this.state;
 
 
-    firebase.storage().ref('images/' + selectedNote).put(file)
+    firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + selectedNote).put(file)
       .then(snapshot => {
-        firebase.storage().ref('images/' + selectedNote).getDownloadURL()
+        firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + selectedNote).getDownloadURL()
           .then(url => this.setState({ selectedNoteImage: url }))
           .catch(err => this.setState({ selectedNoteImage: null }));
       })
@@ -118,7 +118,7 @@ class Dashboard extends Component {
   selectNote(key) {
     this.setState({ selectedNote: key });
 
-    firebase.storage().ref('images/' + key).getDownloadURL()
+    firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + key).getDownloadURL()
       .then(url => this.setState({ selectedNoteImage: url }))
       .catch(err => this.setState({ selectedNoteImage: null }));
   }
