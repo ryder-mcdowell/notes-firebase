@@ -10,18 +10,19 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 class Dashboard extends Component {
   state = {
+    selectedNoteCategory: null,
     selectedNote: null,
     selectedNoteImage: null,
     title: '',
     body: '',
     file: null,
     editing: false,
-    notes: {}
+    noteCategories: {}
   };
 
   componentDidMount() {
-    firebase.database().ref('notes/').on('value', snapshot => {
-      this.setState({ notes: snapshot.val() })
+    firebase.database().ref('categories/').on('value', snapshot => {
+      this.setState({ noteCategories: snapshot.val() })
     });
   }
 
@@ -33,14 +34,28 @@ class Dashboard extends Component {
     this.setState({ [event.target.name]: event.target.files[0] });
   }
 
-  onCreateNoteButton() {
+  onCreateNoteCategoryButton() {
     const {
       title
     } = this.state;
 
-    firebase.database().ref('notes/' + uuidv4()).set({
+    firebase.database().ref('categories/' + uuidv4()).set({
       title
     });
+
+    this.setState({ title: '' });
+  }
+
+  onCreateNoteButton() {
+    const {
+      title,
+      selectedNoteCategory,
+    } = this.state;
+
+    firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + uuidv4()).set({
+      title
+    });
+
     this.setState({ title: '' });
   }
 
@@ -50,27 +65,29 @@ class Dashboard extends Component {
       body,
       editing,
       selectedNote,
-      notes
+      selectedNoteCategory,
+      noteCategories
     } = this.state;
 
     if (editing) {
-      firebase.database().ref('notes/' + selectedNote).update({
+      firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + selectedNote).update({
         title,
         body: body || null
       })
       this.setState({ editing: false });
     } else {
-      this.setState({ editing: true, title: notes[selectedNote].title, body: notes[selectedNote].body });
+      this.setState({ editing: true, title: noteCategories[selectedNoteCategory].notes[selectedNote].title, body: noteCategories[selectedNoteCategory].notes[selectedNote].body });
     }
   }
 
   onDeleteNoteButton() {
     const {
-      selectedNote
+      selectedNote,
+      selectedNoteCategory
     } = this.state;
 
     this.setState({ selectedNote: null });
-    firebase.database().ref('notes/' + selectedNote).remove();
+    firebase.database().ref('categories/' + selectedNoteCategory + '/notes/' + selectedNote).remove();
   }
 
   onUploadFileButton() {
@@ -88,6 +105,16 @@ class Dashboard extends Component {
       })
   }
 
+  selectCategory(key) {
+    const {
+      selectedNoteCategory
+    } = this.state;
+
+    if (key !== selectedNoteCategory) {
+      this.setState({ selectedNoteCategory: key, selectedNote: null });
+    }
+  }
+
   selectNote(key) {
     this.setState({ selectedNote: key });
 
@@ -101,27 +128,31 @@ class Dashboard extends Component {
       title,
       body,
       editing,
+      selectedNoteCategory,
       selectedNote,
       selectedNoteImage,
-      notes
+      noteCategories
     } = this.state;
 
     return (
       <div className="dashboardContainer">
         <List className="listContainer">
           <ListItem
-            onClick={() => this.setState({ selectedNote: 'new' })}
-            selected={selectedNote === 'new'}
+            onClick={() => this.setState({ selectedNoteCategory: 'newNoteCategory' })}
+            selected={selectedNoteCategory === 'newNoteCategory'}
           >
-            <ListItemText>+ New Note</ListItemText>
+            <ListItemText>+ New Category</ListItemText>
           </ListItem>
           {
-            Object.keys(notes).map(key =>
+            Object.keys(noteCategories).map(key =>
               <NoteCategory
-                onClick={() => this.selectNote(key)}
-                selected={selectedNote === key}
+                onClick={() => this.selectCategory(key)}
+                selectNote={key => this.selectNote(key)}
+                onNewNoteButton={() => this.setState({ selectedNote: 'newNote' })}
+                selected={selectedNoteCategory === key}
+                title={noteCategories[key].title}
+                notes={noteCategories[key].notes}
                 key={key}
-                title={notes[key].title}
               />
             )
           }
@@ -131,8 +162,17 @@ class Dashboard extends Component {
           body={body}
           onChange={this.onChange.bind(this)}
           editing={editing}
-          note={selectedNote === 'new' ? 'new' : notes[selectedNote]}
+          note={
+            selectedNoteCategory === 'newNoteCategory'
+              ? 'newNoteCategory'
+              : selectedNote === 'newNote'
+                ? 'newNote'
+                : selectedNote
+                  ? noteCategories[selectedNoteCategory].notes[selectedNote]
+                  : null
+          }
           selectedNoteImage={selectedNoteImage}
+          onCreateNoteCategoryButton={this.onCreateNoteCategoryButton.bind(this)}
           onCreateNoteButton={this.onCreateNoteButton.bind(this)}
           onUpdateNoteButton={this.onUpdateNoteButton.bind(this)}
           onDeleteNoteButton={this.onDeleteNoteButton.bind(this)}

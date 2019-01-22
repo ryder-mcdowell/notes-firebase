@@ -6,7 +6,27 @@ import Button from '@material-ui/core/Button';
 const NoteDetail = props => {
 
   const renderDetail = () => {
-    if (props.note === 'new') {
+    if (props.note === 'newNoteCategory') {
+      return (
+        <div>
+          <Input
+            name="title"
+            value={props.title}
+            onChange={props.onChange}
+            type="text"
+            placeholder="Enter title"
+            disableUnderline
+            className="input"
+          />
+          <Button
+            onClick={props.onCreateNoteCategoryButton}
+            variant="outlined"
+          >
+            Create Note Category
+          </Button>
+        </div>
+      );
+    } else if (props.note === 'newNote') {
       return (
         <div>
           <Input

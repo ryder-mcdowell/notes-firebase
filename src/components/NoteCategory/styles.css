@@ -1,0 +1,4 @@
+.noteCategoryContainer {
+  display: flex;
+  flex-direction: column;
+}
