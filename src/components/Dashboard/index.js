@@ -2,26 +2,27 @@ import React, { Component } from 'react';
 import './styles.css';
 import firebase from '../Firebase';
 import uuidv4 from 'uuid';
+import NoteCategory from '../NoteCategory';
+import NoteDetail from '../NoteDetail';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Input from '@material-ui/core/Input';
-import Button from '@material-ui/core/Button';
 
 class Dashboard extends Component {
   state = {
-    selected: null,
-    selectedImage: null,
+    selectedNoteCategory: null,
+    selectedNote: null,
+    selectedNoteImage: null,
     title: '',
     body: '',
     file: null,
     editing: false,
-    notes: {}
+    noteCategories: {}
   };
 
   componentDidMount() {
-    firebase.database().ref('notes/').on('value', snapshot => {
-      this.setState({ notes: snapshot.val() })
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/').on('value', snapshot => {
+      this.setState({ noteCategories: snapshot.val() })
     });
   }
 
@@ -33,14 +34,28 @@ class Dashboard extends Component {
     this.setState({ [event.target.name]: event.target.files[0] });
   }
 
-  onCreateNoteButton() {
+  onCreateNoteCategoryButton() {
     const {
       title
     } = this.state;
 
-    firebase.database().ref('notes/' + uuidv4()).set({
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + uuidv4()).set({
       title
     });
+
+    this.setState({ title: '' });
+  }
+
+  onCreateNoteButton() {
+    const {
+      title,
+      selectedNoteCategory,
+    } = this.state;
+
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + uuidv4()).set({
+      title
+    });
+
     this.setState({ title: '' });
   }
 
@@ -49,189 +64,121 @@ class Dashboard extends Component {
       title,
       body,
       editing,
-      selected,
-      notes
+      selectedNote,
+      selectedNoteCategory,
+      noteCategories
     } = this.state;
 
     if (editing) {
-      firebase.database().ref('notes/' + selected).update({
+      firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + selectedNote).update({
         title,
         body: body || null
       })
       this.setState({ editing: false });
     } else {
-      this.setState({ editing: true, title: notes[selected].title, body: notes[selected].body });
+      this.setState({ editing: true, title: noteCategories[selectedNoteCategory].notes[selectedNote].title, body: noteCategories[selectedNoteCategory].notes[selectedNote].body });
     }
   }
 
   onDeleteNoteButton() {
     const {
-      selected
+      selectedNote,
+      selectedNoteCategory
     } = this.state;
 
-    this.setState({ selected: null });
-    firebase.database().ref('notes/' + selected).remove();
+    this.setState({ selectedNote: null });
+    firebase.database().ref('/users/' + firebase.auth().currentUser.uid + '/categories/' + selectedNoteCategory + '/notes/' + selectedNote).remove();
   }
 
   onUploadFileButton() {
     const {
       file,
-      selected
+      selectedNote
     } = this.state;
 
 
-    firebase.storage().ref('images/' + selected).put(file)
+    firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + selectedNote).put(file)
       .then(snapshot => {
-        firebase.storage().ref('images/' + selected).getDownloadURL()
-          .then(url => this.setState({ selectedImage: url }))
-          .catch(err => this.setState({ selectedImage: null }));
+        firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + selectedNote).getDownloadURL()
+          .then(url => this.setState({ selectedNoteImage: url }))
+          .catch(err => this.setState({ selectedNoteImage: null }));
       })
   }
 
-  selectNote(key) {
-    this.setState({ selected: key });
-
-    firebase.storage().ref('images/' + key).getDownloadURL()
-      .then(url => this.setState({ selectedImage: url }))
-      .catch(err => this.setState({ selectedImage: null }));
-  }
-
-  renderDetail() {
+  selectCategory(key) {
     const {
-      selected,
-      selectedImage,
-      title,
-      body,
-      editing,
-      notes
+      selectedNoteCategory
     } = this.state;
 
-    if (selected === 'new') {
-      return (
-        <div>
-          <Input
-            name="title"
-            value={title}
-            onChange={this.onChange}
-            type="text"
-            placeholder="Enter title"
-            disableUnderline
-            className="input"
-          />
-          <Button
-            onClick={this.onCreateNoteButton.bind(this)}
-            variant="outlined"
-          >
-            Create Note
-          </Button>
-        </div>
-      );
-    } else if (selected) {
-      return (
-        <div className="detailContent">
-          {
-            editing
-              ? (
-                <div>
-                  <Input
-                    name="title"
-                    value={title}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Enter title"
-                    disableUnderline
-                    className="input"
-                  />
-                  <Input
-                    name="body"
-                    value={body}
-                    onChange={this.onChange}
-                    type="text"
-                    placeholder="Enter body"
-                    disableUnderline
-                    className="input"
-                  />
-                </div>
-              )
-              : (
-                <div className="noteContentContainer">
-                  {notes[selected].title}
-                  <br />
-                  {notes[selected].body}
-                </div>
-              )
-          }
-          <Button
-            onClick={this.onUpdateNoteButton.bind(this)}
-            variant="outlined"
-          >
-            {this.state.editing ? 'Confirm' : 'Update Note'}
-          </Button>
-          <Button
-            onClick={this.onDeleteNoteButton.bind(this)}
-            variant="outlined"
-          >
-            Delete
-          </Button>
-          <input
-            name="file"
-            onChange={this.onFileSelect}
-            type="file"
-            className="fileInput"
-          />
-          <Button
-            onClick={this.onUploadFileButton.bind(this)}
-            variant="outlined"
-          >
-            Upload Image
-          </Button>
-          {selectedImage
-            ? <img
-              src={selectedImage}
-              alt="no source"
-              height="200"
-              width="200"
-              className="noteImage"
-              />
-            : null
-          }
-        </div>
-      );
-    } else {
-      return null;
+    if (key !== selectedNoteCategory) {
+      this.setState({ selectedNoteCategory: key, selectedNote: null });
     }
+  }
+
+  selectNote(key) {
+    this.setState({ selectedNote: key });
+
+    firebase.storage().ref('/users/' + firebase.auth().currentUser.uid + '/images/' + key).getDownloadURL()
+      .then(url => this.setState({ selectedNoteImage: url }))
+      .catch(err => this.setState({ selectedNoteImage: null }));
   }
 
   render() {
     const {
-      selected,
-      notes
+      title,
+      body,
+      editing,
+      selectedNoteCategory,
+      selectedNote,
+      selectedNoteImage,
+      noteCategories
     } = this.state;
 
     return (
       <div className="dashboardContainer">
         <List className="listContainer">
           <ListItem
-            onClick={() => this.setState({ selected: 'new' })}
-            selected={selected === 'new'}
+            onClick={() => this.setState({ selectedNoteCategory: 'newNoteCategory' })}
+            selected={selectedNoteCategory === 'newNoteCategory'}
           >
-            <ListItemText>+ New Note</ListItemText>
+            <ListItemText>+ New Category</ListItemText>
           </ListItem>
           {
-            Object.keys(notes).map(key =>
-              <ListItem
-                onClick={() => this.selectNote(key)}
-                selected={selected === key}
+            Object.keys(noteCategories || {}).map(key =>
+              <NoteCategory
+                onClick={() => this.selectCategory(key)}
+                selectNote={key => this.selectNote(key)}
+                onNewNoteButton={() => this.setState({ selectedNote: 'newNote' })}
+                selected={selectedNoteCategory === key}
+                title={noteCategories[key].title}
+                notes={noteCategories[key].notes}
                 key={key}
-              >
-                <ListItemText>{notes[key].title}</ListItemText>
-              </ListItem>
+              />
             )
           }
         </List>
-        <div className="detailContainer">
-          {this.renderDetail()}
-        </div>
+        <NoteDetail
+          title={title}
+          body={body}
+          onChange={this.onChange.bind(this)}
+          editing={editing}
+          note={
+            selectedNoteCategory === 'newNoteCategory'
+              ? 'newNoteCategory'
+              : selectedNote === 'newNote'
+                ? 'newNote'
+                : selectedNote
+                  ? noteCategories[selectedNoteCategory].notes[selectedNote]
+                  : null
+          }
+          selectedNoteImage={selectedNoteImage}
+          onCreateNoteCategoryButton={this.onCreateNoteCategoryButton.bind(this)}
+          onCreateNoteButton={this.onCreateNoteButton.bind(this)}
+          onUpdateNoteButton={this.onUpdateNoteButton.bind(this)}
+          onDeleteNoteButton={this.onDeleteNoteButton.bind(this)}
+          onFileSelect={this.onFileSelect.bind(this)}
+          onUploadFileButton={this.onUploadFileButton.bind(this)}
+        />
       </div>
     );
   }
